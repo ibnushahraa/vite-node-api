@@ -1,0 +1,62 @@
+# Test files
+test/
+*.test.js
+*.spec.js
+jest.config.js
+coverage/
+.nyc_output/
+
+# Benchmark files
+benchmark/
+
+# Test fixtures
+test-fixtures/
+
+# GitHub
+.github/
+
+# CI/CD
+.travis.yml
+.gitlab-ci.yml
+appveyor.yml
+
+# Examples (optional - remove this line if you want to include examples)
+examples/
+
+# Development files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment files
+.env
+.env.*
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation source (if using docs generator)
+docs/
+
+# Build output
+dist/
+
+# Build config
+tsconfig.json
+.eslintrc*
+.prettierrc*
+.editorconfig
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
