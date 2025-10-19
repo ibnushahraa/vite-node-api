@@ -3,7 +3,7 @@
 [![npm version](https://img.shields.io/npm/v/vite-node-api.svg?style=flat-square)](https://www.npmjs.com/package/vite-node-api)
 [![npm downloads](https://img.shields.io/npm/dm/vite-node-api.svg?style=flat-square)](https://www.npmjs.com/package/vite-node-api)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](LICENSE)
-[![tests](https://img.shields.io/badge/tests-40%20passed-brightgreen.svg?style=flat-square)](https://github.com/ibnushahraa/vite-node-api)
+[![CI](https://github.com/ibnushahraa/vite-node-api/actions/workflows/test.yml/badge.svg)](https://github.com/ibnushahraa/vite-node-api/actions)
 [![coverage](https://img.shields.io/badge/coverage-94%25-brightgreen.svg?style=flat-square)](https://github.com/ibnushahraa/vite-node-api)
 
 🚀 A **Vite plugin** for adding **Node.js API routes** to your Vite + Vue project. **JSON-only**, **single-port** backend and frontend, similar to Next.js API routes but for Vite.
@@ -85,13 +85,64 @@ This creates:
 - `dist/client/` - Frontend files
 - `dist/server/` - Bundled API routes + runtime
 
-### 5. Run Production Server
+### 5. Deploy to Production
+
+#### **Build for Production**
 
 ```bash
+npm run build
+```
+
+This creates:
+```
+dist/
+├── client/           # Frontend static files (HTML, CSS, JS)
+├── server/           # Backend bundled files
+│   ├── entry.mjs    # Production runtime (standalone)
+│   └── server/      # API routes (preserves folder structure)
+│       └── api/
+└── .env             # Auto-copied from .env.production
+```
+
+**Key Features:**
+- ✅ **Standalone** - All dependencies bundled, no `node_modules` needed
+- ✅ **Environment variables** - `.env.production` auto-copied to `dist/.env`
+- ✅ **Folder structure preserved** - `server/api/` stays as `dist/server/server/api/`
+
+#### **Run Production Server**
+
+```bash
+# Simple - just run the entry file
 node dist/server/entry.mjs
 ```
 
-Both frontend and API now run on port `4173` (configurable).
+**OR with custom environment variables:**
+
+```bash
+# Override .env values
+PORT=3000 node dist/server/entry.mjs
+```
+
+Both frontend and API run on the same port (default: `4173`).
+
+#### **Deploy to Server**
+
+Upload only the `dist/` folder:
+
+```bash
+# 1. Build locally
+npm run build
+
+# 2. Upload dist/ to your server
+scp -r dist/ user@server:/var/www/myapp/
+
+# 3. On server, run it
+ssh user@server
+cd /var/www/myapp/dist
+node server/entry.mjs
+```
+
+**No `npm install` needed** - everything is bundled!
 
 ---
 
@@ -251,6 +302,42 @@ viteNodeApi({
   }
 })
 ```
+
+### Environment Variables
+
+vite-node-api automatically handles environment variables for both development and production:
+
+**Development (.env.development):**
+```bash
+# Loaded by Vite dev server
+VITE_APP_API_KEY=dev-key-123
+DATABASE_URL=postgresql://localhost/mydb
+```
+
+**Production (.env.production):**
+```bash
+# Auto-copied to dist/.env during build
+VITE_APP_API_KEY=prod-key-456
+DATABASE_URL=postgresql://production/mydb
+```
+
+**Using in API routes:**
+```js
+// server/api/data.js
+export default async (req, res) => {
+  const apiKey = process.env.VITE_APP_API_KEY
+  const dbUrl = process.env.DATABASE_URL
+
+  // Your logic here
+  return { status: 'ok' }
+}
+```
+
+**Key Points:**
+- ✅ Development: Vite automatically loads `.env.development`
+- ✅ Production: `.env.production` is auto-copied to `dist/.env` during build
+- ✅ Runtime: Production server auto-loads `dist/.env` on startup
+- ✅ Override: Can override env vars when running: `PORT=3000 node dist/server/entry.mjs`
 
 ### Request Object
 

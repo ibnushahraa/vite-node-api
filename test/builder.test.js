@@ -50,7 +50,8 @@ describe("buildBackend", () => {
 
   it("should bundle API files", async () => {
     await buildBackend(testApiDir);
-    expect(fs.existsSync(path.join(outDir, "test.js"))).toBe(true);
+    // With outbase, folder structure is preserved
+    expect(fs.existsSync(path.join(outDir, "builder-test-api", "test.js"))).toBe(true);
   });
 
   it("should warn when no API files found", async () => {

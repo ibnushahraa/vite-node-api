@@ -1,6 +1,6 @@
 {
   "name": "vite-node-api",
-  "version": "1.0.1-beta",
+  "version": "1.0.2-beta",
   "description": "A Vite plugin for adding Node.js API routes to your Vite + Vue project. JSON-only, single-port backend and frontend, similar to Next.js API routes but for Vite.",
   "type": "module",
   "main": "src/index.js",

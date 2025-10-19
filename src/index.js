@@ -143,7 +143,9 @@ export default function viteNodeApi(options = {}) {
 
       req.query = Object.fromEntries(fullUrl.searchParams.entries());
 
-      const mod = await import(safePath + "?t=" + Date.now());
+      // Convert Windows path to file:// URL for ESM import
+      const fileUrl = url.pathToFileURL(safePath).href;
+      const mod = await import(fileUrl + "?t=" + Date.now());
       const fn = mod.default || mod;
       const result = await fn(req, res);
 
@@ -169,9 +171,18 @@ export default function viteNodeApi(options = {}) {
   return {
     name: "vite-node-api",
 
+    config(config) {
+      // Auto-set build.outDir to dist/client for proper structure
+      return {
+        build: {
+          outDir: config.build?.outDir || 'dist/client'
+        }
+      };
+    },
+
     configureServer(server) {
       server.middlewares.use(handler);
-      console.log(`✅ vite-node-api: /api/* active (dev port ${port})`);
+      console.log(`✅ vite-node-api: /api/* routes ready on Vite dev server`);
     },
 
     async closeBundle() {

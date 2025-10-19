@@ -12,10 +12,27 @@ import url from "url";
 import mime from "mime-types";
 import fg from "fast-glob";
 
+const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
+
+// Load .env file if exists
+const envPath = path.join(__dirname, "../.env");
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, "utf-8");
+  envContent.split("\n").forEach((line) => {
+    const trimmed = line.trim();
+    if (trimmed && !trimmed.startsWith("#")) {
+      const [key, ...values] = trimmed.split("=");
+      if (key) {
+        process.env[key.trim()] = values.join("=").trim();
+      }
+    }
+  });
+  console.log("✅ Loaded environment variables from .env");
+}
+
 const PORT = process.env.VITE_NODE_API_PORT || process.env.PORT || 4173;
 const TIMEOUT = parseInt(process.env.VITE_NODE_API_TIMEOUT) || 30_000;
 
-const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const clientDir = path.join(__dirname, "../client");
 const apiDir = path.join(__dirname, "./api");
 
@@ -118,7 +135,9 @@ const server = http.createServer(async (req, res) => {
         req.query = Object.fromEntries(fullUrl.searchParams.entries());
         req.params = params;
 
-        const mod = await import(safePath);
+        // Convert Windows path to file:// URL for ESM import
+        const fileUrl = url.pathToFileURL(safePath).href;
+        const mod = await import(fileUrl);
         const fn = mod.default || mod;
         const result = await fn(req, res);
 
